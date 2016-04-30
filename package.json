@@ -1,0 +1,11 @@
+{
+  "name": "m-lens",
+  "version": "0.1.0",
+  "description": "Primitive lenses for use with ClojureScript datastructures through mori",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "author": "Philip Kuryloski",
+  "license": "MIT"
+}

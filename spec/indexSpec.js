@@ -54,4 +54,25 @@ describe('m-lens', function() {
                 });
         });
     });
+
+    describe('composing lenses', function() {
+        it('function composition stacks the lenses', function() {
+            let lens = m.comp(at(['nested']), at(['map']));
+
+            expect(m.toJs(view(data, lens)))
+                .toEqual({
+                    one: 1,
+                    two: 2
+                });
+
+            expect(m.toJs(update(data, lens, m.constantly(3))))
+                .toEqual({
+                    map: {
+                        vector: [4, 5, 6],
+                        nested: 3
+                    },
+                    vector: [1, 2, 3]
+                });
+        });
+    });
 });

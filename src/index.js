@@ -1,7 +1,14 @@
 import m from "mori";
 
 export function at(path) {
-    return [[path, []]];
+    return function(other) {
+        if (other) {
+            return m.map(function([from, to]) {
+                return [from.concat(path), to];
+            }, other);
+        }
+        return [[path, []]];
+    };
 }
 
 export function view(data, lens) {
@@ -14,7 +21,7 @@ export function view(data, lens) {
         } else {
             return m.merge(acc, value);
         }
-    }, m.hashMap(), lens);
+    }, m.hashMap(), lens());
 }
 
 export function update(data, lens, f) {
@@ -25,5 +32,5 @@ export function update(data, lens, f) {
         } else {
             return m.assocIn(data, from, value);
         }
-    }, data, lens)
+    }, data, lens())
 }

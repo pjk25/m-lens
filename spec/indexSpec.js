@@ -1,5 +1,5 @@
 import m from "mori";
-import { view, update, at } from "../src/index.js"
+import { view, update, at, pull } from "../src/index.js"
 
 describe('m-lens', function() {
     let data;
@@ -51,6 +51,23 @@ describe('m-lens', function() {
                         nested: 3
                     },
                     vector: [1, 2, 3]
+                });
+        });
+    });
+    
+    describe('pull', function() {
+        it('focuses on a portion of the structure', function() {
+            let lens = pull([{'map': ['vector', 'nested']}]);
+            
+            expect(m.toJs(view(data, lens)))
+                .toEqual({
+                    map: {
+                        vector: [4, 5, 6],
+                        nested: {
+                            one: 1,
+                            two: 2
+                        }
+                    }
                 });
         });
     });

@@ -1,14 +1,23 @@
-import m from "mori";
+import m from 'mori';
+import { flatten } from './pull';
 
 export function at(path) {
     return function(other) {
         if (other) {
-            return m.map(function([from, to]) {
+            return other.map(function([from, to]) {
                 return [from.concat(path), to];
-            }, other);
+            });
         }
         return [[path, []]];
     };
+}
+
+export function pull(tree) {
+    return function() {
+        return m.toJs(m.map(function (path) {
+            return [path, path];
+        }, flatten([], tree)));
+    }
 }
 
 export function view(data, lens) {

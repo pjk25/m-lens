@@ -3,43 +3,68 @@ import { flatten } from './pull';
 
 export function at(path) {
     return function(other) {
-        if (other) {
-            return other.map(function([from, to]) {
-                return [from.concat(path), to];
-            });
+        function g(data) {
+            return m.getIn(data, path);
         }
-        return [[path, []]];
-    };
+
+        function u(data, f) {
+            return m.updateIn(data, path, f);
+        }
+
+        if (other) {
+            return {
+                g: function(data) {
+                    return g(other.g(data));
+                },
+                u: function(data, f) {
+                    return other.u(data, function(d) {
+                        return u(d, f);
+                    });
+                }
+            }
+        }
+
+        return {
+            g: g,
+            u: u
+        }
+    }
 }
 
 export function pull(tree) {
     return function() {
-        return m.toJs(m.map(function (path) {
-            return [path, path];
-        }, flatten([], tree)));
+        function g(data) {
+            if (m.isMap(data)) {
+                return m.reduce(function(acc, path) {
+                    return m.assocIn(acc, path, m.getIn(data, path));
+                }, m.hashMap(), flatten([], tree));
+            }
+            else {
+                return m.reduce(function(acc, path) {
+                    return m.assocIn(acc, path, m.getIn(data, path));
+                }, m.hashMap(), flatten([], tree));
+            }
+        }
+
+        function u(data, f) {
+            let updated = f(g(data));
+
+            return m.reduce(function(acc, path) {
+                return m.assocIn(acc, path, m.getIn(updated, path));
+            }, data, tree);
+        }
+
+        return {
+            g: g,
+            u: u
+        }
     }
 }
 
 export function view(data, lens) {
-    return m.reduce(function(acc, [from, to]) {
-        const value = m.getIn(data, from);
-        if (to.length) {
-            return m.assocIn(acc, to, value);
-        } else if (m.isVector(value)) {
-            return value;
-        } else {
-            return m.merge(acc, value);
-        }
-    }, m.hashMap(), lens());
+    return lens().g(data);
 }
 
 export function update(data, lens, f) {
-    const value = f(view(data, lens));
-    return m.reduce(function(acc, [from, to]) {
-        if (to.length) {
-            return m.assocIn(data, from, m.getIn(value, to));
-        } else {
-            return m.assocIn(data, from, value);
-        }
-    }, data, lens())
+    return lens().u(data, f);
 }

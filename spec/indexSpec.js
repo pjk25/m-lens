@@ -35,8 +35,10 @@ describe('m-lens', function() {
                     },
                     vector: 3
                 });
+        });
 
-            lens = at(['map', 'nested']);
+        it('returns a lens that focuses on a path of a structure', function() {
+            let lens = at(['map', 'nested']);
 
             expect(m.toJs(view(data, lens)))
                 .toEqual({
@@ -54,11 +56,11 @@ describe('m-lens', function() {
                 });
         });
     });
-    
+
     describe('pull', function() {
         it('focuses on a portion of the structure', function() {
             let lens = pull([{'map': ['vector', 'nested']}]);
-            
+
             expect(m.toJs(view(data, lens)))
                 .toEqual({
                     map: {
@@ -87,6 +89,32 @@ describe('m-lens', function() {
                     map: {
                         vector: [4, 5, 6],
                         nested: 3
+                    },
+                    vector: [1, 2, 3]
+                });
+        });
+
+        xit('function composition stacks heterogenous lenses', function() {
+            let lens = m.comp(
+                pull([{'nested': ['one']}]),
+                at(['map'])
+            );
+
+            expect(m.toJs(view(data, lens)))
+                .toEqual({
+                    nested: {
+                        one: 1
+                    }
+                });
+
+            expect(m.toJs(update(data, lens, m.constantly(3))))
+                .toEqual({
+                    map: {
+                        vector: [4, 5, 6],
+                        nested: {
+                            one: 3,
+                            two: 2
+                        }
                     },
                     vector: [1, 2, 3]
                 });

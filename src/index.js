@@ -32,26 +32,31 @@ export function at(path) {
 }
 
 export function pull(tree) {
-    return function() {
+    return function(other) {
         function g(data) {
-            if (m.isMap(data)) {
-                return m.reduce(function(acc, path) {
-                    return m.assocIn(acc, path, m.getIn(data, path));
-                }, m.hashMap(), flatten([], tree));
-            }
-            else {
-                return m.reduce(function(acc, path) {
-                    return m.assocIn(acc, path, m.getIn(data, path));
-                }, m.hashMap(), flatten([], tree));
-            }
+            return m.reduce(function(acc, path) {
+                return m.assocIn(acc, path, m.getIn(data, path));
+            }, m.hashMap(), flatten(m.vector(), tree));
         }
 
         function u(data, f) {
             let updated = f(g(data));
-
             return m.reduce(function(acc, path) {
                 return m.assocIn(acc, path, m.getIn(updated, path));
-            }, data, tree);
+            }, data, flatten(m.vector(), tree));
+        }
+
+        if (other) {
+            return {
+                g: function(data) {
+                    return g(other.g(data));
+                },
+                u: function(data, f) {
+                    return other.u(data, function(d) {
+                        return u(d, f);
+                    });
+                }
+            }
         }
 
         return {

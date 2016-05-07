@@ -19,7 +19,7 @@ describe('m-lens', function() {
 
     describe('at', function() {
         it('returns a lens that focuses on a property of a structure', function() {
-            let lens = at(['vector']);
+            let lens = at(m.vector('vector'));
 
             expect(m.toJs(view(data, lens)))
                 .toEqual([1, 2, 3]);
@@ -38,7 +38,7 @@ describe('m-lens', function() {
         });
 
         it('returns a lens that focuses on a path of a structure', function() {
-            let lens = at(['map', 'nested']);
+            let lens = at(m.vector('map', 'nested'));
 
             expect(m.toJs(view(data, lens)))
                 .toEqual({
@@ -59,7 +59,7 @@ describe('m-lens', function() {
 
     describe('pull', function() {
         it('focuses on a portion of the structure', function() {
-            let lens = pull([{'map': ['vector', 'nested']}]);
+            let lens = pull(m.toClj([{'map': ['vector', 'nested']}]));
 
             expect(m.toJs(view(data, lens)))
                 .toEqual({
@@ -71,12 +71,14 @@ describe('m-lens', function() {
                         }
                     }
                 });
+
+            //todo: add an update expectation
         });
     });
 
     describe('composing lenses', function() {
         it('function composition stacks the lenses', function() {
-            let lens = m.comp(at(['nested']), at(['map']));
+            let lens = m.comp(at(m.vector('nested')), at(m.vector('map')));
 
             expect(m.toJs(view(data, lens)))
                 .toEqual({
@@ -94,10 +96,10 @@ describe('m-lens', function() {
                 });
         });
 
-        xit('function composition stacks heterogenous lenses', function() {
+        it('function composition stacks heterogenous lenses', function() {
             let lens = m.comp(
-                pull([{'nested': ['one']}]),
-                at(['map'])
+                pull(m.toClj([{'nested': ['one']}])),
+                at(m.vector('map'))
             );
 
             expect(m.toJs(view(data, lens)))
@@ -107,7 +109,7 @@ describe('m-lens', function() {
                     }
                 });
 
-            expect(m.toJs(update(data, lens, m.constantly(3))))
+            expect(m.toJs(update(data, lens, m.curry(m.assocIn, m.vector('nested', 'one'), 3))))
                 .toEqual({
                     map: {
                         vector: [4, 5, 6],

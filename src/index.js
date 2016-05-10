@@ -42,7 +42,22 @@ export function pull(tree) {
         function u(data, f) {
             let updated = f(g(data));
             return m.reduce(function(acc, path) {
-                return m.assocIn(acc, path, m.getIn(updated, path));
+                let paths = m.map(m.subvec, m.repeat(path), m.repeat(0), m.range(m.count(path), 0, -1));
+
+                let r = m.some(m.identity, m.map(function(path) {
+                    let e = m.getIn(updated, path);
+                    if (e) {
+                        return {
+                            path: path,
+                            value: e
+                        }
+                    }
+                }, paths));
+
+                if (r) {
+                    return m.assocIn(acc, r.path, r.value);
+                }
+                return acc;
             }, data, flatten(m.vector(), tree));
         }
 

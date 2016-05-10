@@ -72,7 +72,17 @@ describe('m-lens', function() {
                     }
                 });
 
-            //todo: add an update expectation
+            expect(m.toJs(update(data, lens, m.curry(m.assocIn, m.vector('map', 'nested', 'one'), 2))))
+                .toEqual({
+                    map: {
+                        vector: [4, 5, 6],
+                        nested: {
+                            one: 2,
+                            two: 2
+                        }
+                    },
+                    vector: [1, 2, 3]
+                });
         });
     });
 
@@ -117,6 +127,22 @@ describe('m-lens', function() {
                             one: 3,
                             two: 2
                         }
+                    },
+                    vector: [1, 2, 3]
+                });
+        });
+
+        it('function composition can change types', function() {
+            let lens = m.comp(
+                pull(m.toClj([{'nested': ['one']}])),
+                at(m.vector('map'))
+            );
+
+            expect(m.toJs(update(data, lens,  m.curry(m.assoc, 'nested', 3))))
+                .toEqual({
+                    map: {
+                        vector: [4, 5, 6],
+                        nested: 3
                     },
                     vector: [1, 2, 3]
                 });

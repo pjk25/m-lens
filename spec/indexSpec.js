@@ -1,5 +1,5 @@
 import m from "mori";
-import { view, update, at, pull, as } from "../src/index.js"
+import { view, update, at, pull, as, join } from "../src/index.js"
 
 describe('m-lens', function() {
     let data;
@@ -96,7 +96,7 @@ describe('m-lens', function() {
                 });
 
             expect(m.toJs(update(data, lens, function(d) {
-                return m.updateIn(d, ['array', 1], m.inc)
+                return m.updateIn(d, m.vector('array', 1), m.inc)
             })))
                 .toEqual({
                     map: {
@@ -168,6 +168,40 @@ describe('m-lens', function() {
                     map: {
                         vector: [4, 5, 6],
                         nested: 3
+                    },
+                    vector: [1, 2, 3]
+                });
+        });
+    });
+
+    describe('joining lenses', function() {
+        it('join can superimpose lenses', function() {
+            let q = pull(m.vector(m.hashMap('map', m.vector('vector'))));
+            let rename = as(m.vector('map', 'nested'), m.vector('map', 'map'));
+
+            let joined = join(q, rename);
+
+            expect(m.toJs(view(data, joined)))
+                .toEqual({
+                    map: {
+                        map: {
+                            one: 1,
+                            two: 2
+                        },
+                        vector: [4, 5, 6]
+                    }
+                });
+
+            expect(m.toJs(update(data, joined, function (d) {
+                return m.assocIn(d, m.vector('map', 'map', 'one'), 3);
+            })))
+                .toEqual({
+                    map: {
+                        vector: [4, 5, 6],
+                        nested: {
+                            one: 3,
+                            two: 2
+                        }
                     },
                     vector: [1, 2, 3]
                 });

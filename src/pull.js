@@ -1,6 +1,5 @@
 import m from 'mori';
 
-//todo: make 1st arg optional
 export function flatten(parent, tree) {
     return m.reduce(function(acc, val) {
         if (m.isMap(val)) {

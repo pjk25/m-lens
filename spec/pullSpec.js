@@ -1,5 +1,5 @@
 import m from 'mori';
-import {flatten} from '../src/pull';
+import { flatten } from '../src/pull';
 
 describe('pull', function() {
     describe('flatten', function() {

@@ -1,5 +1,13 @@
 import m from 'mori';
 import { flatten } from './pull';
+import { overlay } from './overlay';
+
+function size(a) {
+    if (a) {
+        return a.length;
+    }
+    return 0;
+}
 
 function makeLens(g, u) {
     return function(other) {
@@ -86,4 +94,28 @@ export function view(data, lens) {
 
 export function update(data, lens, f) {
     return lens().u(data, f);
+}
+
+function joinTwo(lhs, rhs) {
+    function g(data) {
+        return overlay(lhs().g(data), rhs().g(data));
+    }
+
+    function u(data, f) {
+        let updated = f(g(data));
+        return lhs().u(rhs().u(data, m.constantly(updated)), m.constantly(updated));
+    }
+
+    return makeLens(g, u);
+}
+
+export function join(...lenses) {
+    let [x, ...xs] = lenses;
+    if (size(xs) > 1) {
+        return joinTwo(x, join(...xs));
+    } else if (size(xs) > 0) {
+        return joinTwo(x, xs[0]);
+    } else {
+        return x;
+    }
 }

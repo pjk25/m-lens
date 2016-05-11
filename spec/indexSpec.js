@@ -1,5 +1,5 @@
 import m from "mori";
-import { view, update, at, pull } from "../src/index.js"
+import { view, update, at, pull, as } from "../src/index.js"
 
 describe('m-lens', function() {
     let data;
@@ -78,6 +78,31 @@ describe('m-lens', function() {
                         vector: [4, 5, 6],
                         nested: {
                             one: 2,
+                            two: 2
+                        }
+                    },
+                    vector: [1, 2, 3]
+                });
+        });
+    });
+
+    describe('as', function() {
+        it('renames a path in the structure', function() {
+            let lens = as(m.vector('map', 'vector'), m.vector('array'));
+
+            expect(m.toJs(view(data, lens)))
+                .toEqual({
+                    array: [4, 5, 6]
+                });
+
+            expect(m.toJs(update(data, lens, function(d) {
+                return m.updateIn(d, ['array', 1], m.inc)
+            })))
+                .toEqual({
+                    map: {
+                        vector: [4, 6, 6],
+                        nested: {
+                            one: 1,
                             two: 2
                         }
                     },

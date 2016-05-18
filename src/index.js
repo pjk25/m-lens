@@ -109,8 +109,7 @@ function joinTwo(lhs, rhs) {
     return makeLens(g, u);
 }
 
-export function join(...lenses) {
-    let [x, ...xs] = lenses;
+export function join(x, ...xs) {
     if (size(xs) > 1) {
         return joinTwo(x, join(...xs));
     } else if (size(xs) > 0) {

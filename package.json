@@ -2,6 +2,7 @@
   "name": "m-lens",
   "version": "0.1.0",
   "description": "Primitive lenses for use with ClojureScript datastructures through mori",
+  "files": ["README.md"],
   "main": "src/index.js",
   "scripts": {
     "readme": "node support/renderReadme.js > README.md",

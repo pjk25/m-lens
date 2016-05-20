@@ -4,7 +4,7 @@
   "description": "Primitive lenses for use with ClojureScript datastructures through mori",
   "main": "src/index.js",
   "scripts": {
-    "readme": "ln -sf $(pwd)/src node_modules/m-lens && node support/renderReadme.js > README.md",
+    "readme": "node support/renderReadme.js > README.md",
     "prepublish": "npm run readme && dist-es6",
     "test": "jasmine"
   },

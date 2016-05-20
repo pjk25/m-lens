@@ -1,0 +1,48 @@
+# m-lens
+
+m-lens provides 3 types of lenses and a corresponding view and update functions,
+that work directly with vector and hash map datastructures from
+[mori](https://www.npmjs.com/package/mori).
+
+## example
+
+{{{code}}}
+---
+{{{output}}}
+
+## API
+
+### view
+
+view a datastructure through a lens
+
+### update
+
+update a datastructure by applying a function over the foci of a lens
+
+### at
+
+make a lens that focuses on the element at the given path of a structure
+
+### pull
+
+make a lens that extracts a subtree from a datastructure
+
+* queries are provided in a simplified form of the datomic pull syntax (wildcards,
+limits, defaults, or recursion)
+
+### as
+
+make a lens that presents the element at a given path at a different path
+
+### _composition_
+
+lenses are functions that when composed, produce a new lens equivalent to
+applying the composed lenses in sequence
+
+### join
+
+make a lens that merges the foci of the joined lenses
+
+* the behavior of joined lenses where structures collide (i.e. through pull &
+as) is of last wins when viewing, and undefined for updates
